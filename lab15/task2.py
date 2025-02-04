@@ -11,6 +11,10 @@ try:
 
     print(monthly_sum)
 
+    most_popular_month = monthly_sum.idxmax()
+    max_visits = monthly_sum.max()
+    print(f"Найбільш популярний місяць: {most_popular_month}")
+
     plt.figure(figsize=(10, 6))
     monthly_sum.plot(kind='bar', color='skyblue')
     plt.title('Відвідування за кожен місяць')
