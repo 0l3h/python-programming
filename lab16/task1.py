@@ -1,42 +1,50 @@
 import nltk
 import string
-import numpy as np
 import matplotlib.pyplot as plt
-from collections import Counter 
+from collections import Counter
+from nltk.corpus import stopwords
 
 nltk.download('gutenberg')
-nltk.download('punkt_tab')
+nltk.download('punkt')
+nltk.download('stopwords')
 
 text = nltk.corpus.gutenberg.words('burgess-busterbrown.txt')
 text_string = ' '.join(text)
 
 def count_words(text):
-    sentences = nltk.sent_tokenize(text)
-    k_words = 0
+    words = nltk.word_tokenize(text)
+    return len(words)
 
-    for sentence in sentences:
-        words = nltk.word_tokenize(sentence)
-        k_words += len(words)
+def most_used_words(text, stop_words):
+    words = nltk.word_tokenize(text)
+    words = [word.lower() for word in words if word.isalpha() and word.lower() not in stop_words]
+    cnt = Counter(words)
+    most_common = cnt.most_common(10)
+    x = [word for word, _ in most_common]
+    y = [count for _, count in most_common]
 
-    return k_words
-
-def most_used_words(text):
-    text1 = text.split()
-    text1 = [word.lower().strip(string.punctuation) for word in text1 if word not in string.punctuation]
-    
-    cnt = Counter(text1)
-    cort = cnt.most_common(10)
-    x = [word for word, _ in cort]
-    y = [count for _, count in cort]
-
-    plt.bar(x, y)
-    plt.title("10 найбільш вживаних слів у тексті")
-    plt.xlabel("Слова")
-    plt.ylabel("Зустрічаються разів у тексті")
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
+    return x, y
 
 total_words = count_words(text_string)
-print(f"Всього слів у тексті: {total_words}")
-most_used_words(text_string)
+stop_words = set(stopwords.words('english'))
+x_original, y_original = most_used_words(text_string, stop_words)
+
+plt.figure(figsize=(10, 6))
+plt.bar(x_original, y_original, color='skyblue')
+plt.title("10 найбільш вживаних слів у тексті (оригінал)")
+plt.xlabel("Слова")
+plt.ylabel("Зустрічаються разів у тексті")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+x_cleaned, y_cleaned = most_used_words(text_string, stop_words)
+
+plt.figure(figsize=(10, 6))
+plt.bar(x_cleaned, y_cleaned, color='lightcoral')
+plt.title("10 найбільш вживаних слів у тексті (без стоп-слів)")
+plt.xlabel("Слова")
+plt.ylabel("Зустрічаються разів у тексті")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
