@@ -1,16 +1,13 @@
 import nltk
 import string
-import numpy as np
 import re
-import matplotlib.pyplot as plt
-from collections import Counter 
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.stem import PorterStemmer
 from nltk.tokenize import sent_tokenize, word_tokenize
 
 nltk.download('gutenberg')
-nltk.download('punkt_tab')
+nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('stopwords')
 
@@ -20,37 +17,27 @@ text_string = ' '.join(text)
 with open('nltk_results.txt', 'w') as write_file:
     # Токенізація
     sentences = nltk.sent_tokenize(text_string)
-    for sentence in sentences:
-        words = nltk.word_tokenize(sentence)
-    print(words)
-    write_file.write(' '.join(words) + '\n')
+    all_words = []
 
     # Стеммінг
-    words = word_tokenize(text_string)
     ps = PorterStemmer()
-    for w in words:
-        rootWord=ps.stem(w)
-        print(rootWord)
-        write_file.write(rootWord + '\n')
+    for sentence in sentences:
+        words = nltk.word_tokenize(sentence)
+        stemmed_words = [ps.stem(w) for w in words]
+        all_words.extend(stemmed_words)
 
     # Лематизація
     wordnet_lemmatizer = WordNetLemmatizer()
-    tokenization = nltk.word_tokenize(text_string)
-
-    for w in tokenization:
-        print("Лема {}: {}".format(w, wordnet_lemmatizer.lemmatize(w)))
-        write_file.write("Лема {}: {}".format(w, wordnet_lemmatizer.lemmatize(w)) + '\n')
+    lemmatized_words = [wordnet_lemmatizer.lemmatize(w) for w in all_words]
 
     # Видалення стоп-слів
     stop_words = set(stopwords.words("english"))
-    words = nltk.word_tokenize(text_string)
-    without_stop_words = [word for word in words if not word in stop_words] 
-    print(without_stop_words)
-    write_file.write(' '.join(without_stop_words) + '\n')
+    filtered_words = [word for word in lemmatized_words if word not in stop_words]
 
     # Видалення пунктуації
-    l = nltk.word_tokenize(text_string)
-    ll = [x for x in l if not re.fullmatch('[' + string.punctuation + ']+', x)]
+    final_words = [word for word in filtered_words if word not in string.punctuation]
 
-    print(ll)
-    write_file.write(" ".join(ll) + '\n')
+    final_text = ' '.join(final_words)
+
+    print(final_text)
+    write_file.write(final_text + '\n')
